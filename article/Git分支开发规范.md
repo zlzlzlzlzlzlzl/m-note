@@ -34,7 +34,7 @@
 
 ### 常见任务
 **增加新功能**
-```
+```js
 (dev)$: git checkout -b feature/xxx            # 从dev建立特性分支
 (feature/xxx)$: blabla                         # 开发
 (feature/xxx)$: git add xxx
@@ -133,3 +133,4 @@
 - [Git分支管理策略](http://www.ruanyifeng.com/blog/2012/07/git.html)
 - [如何写好 Git commit messages](http://ivweb.io/topic/58abda9d2117ae2f4995b4a8)
 - [git commit 规范指南](https://segmentfault.com/a/1190000009048911)
+
