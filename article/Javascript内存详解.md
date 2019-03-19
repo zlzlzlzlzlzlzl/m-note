@@ -1,5 +1,7 @@
 # Javascript 内存详解
 
+![JS内存目录](/images/Javascript内存详解/JS内存目录.png)
+
 ## 简介 
 某些语言，比如C有低级的原生内存管理原语，像malloc()和free()。开发人员使用这些原语可以显式分配和释放操作系统的内存。
 
@@ -7,7 +9,7 @@
 
 ## 内存生命周期
 无论使用什么编程语言，内存生命周期基本是一致的：
-![内存生命周期图](https://user-gold-cdn.xitu.io/2019/3/14/1697b3f0d29ec850?w=2180&h=710&f=png&s=87580)
+![内存生命周期图](/images/Javascript内存详解/生命周期.png)
 
 - 分配内存： 内存被操作系统分配，允许程序使用它 （当申明变量、函数、对象的时候，系统会自动为他们分配内存）
 - 使用内存：通过在代码操作变量对内在进行读和写 (也就是使用变量、函数等)
@@ -38,81 +40,139 @@ Number、String、Null、Boolean、Undefiend、Symbol(ES6新增)
 
 堆数据结构是一种树状结构。它的存取数据的方式，则与书架与书非常相似。
 
+所熟知的引用数据类型：
+```Javascript
+Object、Array、Date、RegExp、Function 等。
+```
+
+**为了更好的搞懂变量对象与堆内存，我们可以结合以下例子与图解进行理解。**
+```javascript
+var a1 = 0;   // 变量对象
+var a2 = 'this is string'; // 变量对象
+var a3 = null; // 变量对象
+
+var b = { m: 20 }; // 变量b存在于变量对象中，{m: 20} 作为对象存在于堆内存中
+var c = [1, 2, 3]; // 变量c存在于变量对象中，[1, 2, 3] 作为对象存在于堆内存中
+```
+
+![Javascript内存详解-2](/images/Javascript内存详解/2.jpg)
+
+因此当我们要访问堆内存中的引用数据类型时，实际上我们首先是从变量对象中获取了该对象的地址引用（或者地址指针），然后再从堆内存中取得我们需要的数据。
+
+理解了JS的内存空间，我们就可以借助内存空间的特性来验证一下引用类型的一些特点了。
+
+**接下来，我们通过下面的例子来加深对JS内存的理解**
+```javascript
+var a = 20;
+var b = a;
+b = 30;
+
+var m = { a: 10, b: 20 };
+var n = m;
+n.a = 15; 
+```
+此时a的值是什么？ 而m.a的值又是什么？
+
+![Javascript内存详解-3](/images/Javascript内存详解/3.jpg)
+
+在变量对象中的数据发生复制行为时，系统会自动为新的变量分配一个新值。var b = a执行之后，a与b虽然值都等于20，但是他们其实已经是相互独立互不影响的值了。具体如图。所以我们修改了b的值以后，a的值并不会发生变化。
+
+![Javascript内存详解-4](/images/Javascript内存详解/4.jpg)
+
+通过var n = m执行一次复制引用类型的操作。引用类型的复制同样也会为新的变量自动分配一个新的值保存在变量对象中，但不同的是，这个新的值，仅仅只是引用类型的一个地址指针。当地址指针相同时，尽管他们相互独立，但是在变量对象中访问到的具体对象实际上是同一个。
+
 ## 垃圾回收
 垃圾回收是一种内存管理机制，就是将不再用到的内存及时释放，以防内存占用越来越高，导致卡顿甚至进程崩溃。在JavaScript中有垃圾回收机制，其作用就是自动回收过期无效的变量。
 
+> 在JavaScript中内存垃圾回收是由js引擎自动完成的。实现垃圾回收的关键在于如何确定内存不再使用，也就是确定对象是否无用。主要有两种方式：引用计数 和 标记清除。
+
 ### 垃圾回收算法
+##### 引用计数（reference counting）
+这是IE6、7采用的一种比较老的垃圾回收机制。这是最初级的垃圾收集算法。此算法把“对象是否不再需要”简化定义为“对象有没有其他对象引用到它”。如果没有引用指向该对象（零引用），对象将被垃圾回收机制回收。
 
-## 内存泄漏
-### 4种常见的JavaScript内存泄漏
-#### 1. 意外的全局变量
-JavaScript用一个有趣的方式管理未被声明的变量：对未声明的变量的引用在全局对象里创建一个新的变量。在浏览器的情况下，这个全局对象是window。
-```javascript
-function foo(arg) {
-  bar = "some text";
-}
-```
-等同于
-```javascript
-function foo(arg) {
-  window.bar = "some text";
-}
-```
-函数 `foo` 内部忘记使用 `var`，意外创建了一个全局变量。在这个例子里，泄漏一个简单的字符串不会造成很大的伤害，但是它确实有可能变得更糟。
-
-另外一个意外创建全局变量的方法是通过`this`:
-```javascript
-function foo() {
-  this.var1 = "potential accidental global";
-}
-
-// Foo作为函数调用，this指向全局变量(window)
-// 而不是undefined
-foo();
-```
-> 为了防止这些问题发生，可以在你的JaveScript文件开头使用 `'use strict'`；启用严格模式解析JavaScript来阻止意外的全局变量。
-
-除了意外创建的全局变量，明确创建的全局变量同样也很多。这些当然属于不能被回收的（除非被指定为null或者重新分配）。特别那些用于暂时存储数据的全局变量，是非常重要的。如果你必须要使用全局变量来存储大量数据，确保在是使用完成之后为其赋值null或者重新赋其他值。
-
-#### 2. 被遗忘的定时器或者回调
-
-#### 3. 闭包
-闭包是JavaScript开发的一个关键方面：一个内部函数使用了外部（封闭）函数的变量。由于JavaScript运行时实现的不同，它可能以下面的方式造成内存泄漏：
-
-```javascript
-var theThing = null;
-
-var replaceThing = function () {
-
-  var originalThing = theThing;
-  var unused = function () {
-    if (originalThing) // 引用'originalThing'
-      console.log("hi");
-  };
-
-  theThing = {
-    longStr: new Array(1000000).join('*'),
-    someMethod: function () {
-      console.log("message");
-    }
-  };
+```javascript 
+var o1 = {
+  o2: {
+    x: 1
+  }
 };
 
-setInterval(replaceThing, 1000);
+//2个对象被创建
+/'o2'被'o1'作为属性引用
+//谁也不能被回收
+
+var o3 = o1; //'o3'是第二个引用'o1'指向对象的变量
+
+o1 = 1;      //现在，'o1'只有一个引用了，就是'o3'
+var o4 = o3.o2; // 引用'o3'对象的'o2'属性
+                //'o2'对象这时有2个引用： 一个是作为对象的属性
+                //另一个是'o4'
+
+o3 = '374'; //'o1'原来的对象现在有0个对它的引用
+             //'o1'可以被垃圾回收了。
+            //然而它的'o2'属性依然被'o4'变量引用，所以'o2'不能被释放。
+
+o4 = null;  //最初'o1'中的'o2'属性没有被其他的引用了
+           //'o2'可以被垃圾回收了
 ```
 
-这段代码做了一件事：每次`ReplaceThing`被调用，`theThing`获得一个包含大数组和新的闭包(`someMethod`)的对象。同时，变量`unused`保持了一个引用`originalThing`(`theThing`是上次调用`replaceThing`生成的值)的闭包。已经有点困惑了吧？最重要的事情是**一旦为同一父域中的作用域产生闭包，则该作用域是共享的**。
+**循环引用创造麻烦**
+在涉及循环引用的时候有一个限制。在下面的例子中，两个对象被创建了，而且相互引用，这样创建了一个循环引用。它们会在函数调用后超出作用域，应该可以释放。然而引用计数算法考虑到2个对象中的每一个至少被引用了一次，因此都不可以被回收。
 
-这里，作用域产生了闭包， `someMethod`和`unused`共享这个闭包中的内存。`unused`引用了`originalThing`。尽管`unused`不会被使用， `someMethod`可以通过theThing来使用replaceThing作用域外的变量（例如某些全局的）。而且 `someMethod`和`unused`有共同的闭包作用域，`unused`对`originalThing`的引用强制`oriiginalThing`保持激活状态(两个闭包共享整个作用域)。这阻止了它的回收。
+```javascript
+function f() {
+  var o1 = {};
+  var o2 = {};
+  o1.p = o2; // o1 引用 o2
+  o2.p = o1; // o2 引用 o1\. 形成循环引用
+}
 
-当这段代码重复执行，可以观察到被使用的内存在持续增加。垃圾回收运行的时候也不会变小。从本质上来说，闭包的连接列表已经创建了(以theThing变量为根)，这些闭包每个作用域都间接引用了大数组，导致大量的内存泄漏。
+f();
+```
+![Javascript内存详解-6](/images/Javascript内存详解/6.png)
 
-[Meteor 的博文](https://blog.meteor.com/an-interesting-kind-of-javascript-memory-leak-8b47d2e7f156) 解释了如何修复此种问题。在 replaceThing 的最后添加 originalThing = null 。
 
-#### 4. DOM外引用
+#### 标记清除（mark and sweep）
+工作原理简化后就是：从垃圾收集根（root）对象（在JavaScript中为全局环境记录）开始，标记出所有可以获得的对象，然后清除掉所有未标记的不可获得的对象。
+
+这个算法把“对象是否不再需要”简化定义为“对象是否可以获得”。
+
+![Javascript内存详解-7](/images/Javascript内存详解/7.gif)
+
+2012年起，所有浏览器都内置了标记清除垃圾回收器。
+
+## 内存泄漏
+内存泄漏基本上就是不再被应用需要的内存，由于某种原因，没有被归还给操作系统或者进入可用内存池。简单来说： 就是不再用到的内存，没有及时释放，就叫做内存泄漏（memory leak）。
+
+
+### Chrome 浏览器查看内存占用
+按照以下步骤操作
+- 打开Chrome浏览器开发者工具的Performance面板
+- 选项栏中勾选Memory选项
+- 点击左上角录制按钮（实心圆状按钮）
+- 在页面上进行正常操作
+- 一段时间后，点击Stop，观察面板上的数据
+
+![Javascript内存详解-8](/images/Javascript内存详解/8.jpg)
+
+更多方式查看内存占用，[点击这里](http://jinlong.github.io/2016/05/01/4-Types-of-Memory-Leaks-in-JavaScript-and-How-to-Get-Rid-Of-Them/)
+
+### 4种常见的JavaScript内存泄漏
+* 1. 意外的全局变量
+* 2. 被遗忘的定时器或者回调
+* 3. 闭包
+* 4. DOM外引用
+
+> 闭包本身不会造成内存泄露，程序写错了才会造成内存泄漏或者闭包过多很容易导致内存泄漏。
+
+具体详情点击[【译】JavaScript是如何工作的：内存管理 + 如何处理4个常见的内存泄露](https://segmentfault.com/a/1190000011411121)
+
+## 总结
+![JS内存详解](/images/Javascript内存详解/JS内存详解.png)
 
 ## 参考资料
-[内存管理](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Memory_Management)
-[前端基础进阶（一）：内存空间详细图解](https://www.jianshu.com/p/996671d4dcc4)
-[JavaScript 内存泄漏教程](http://www.ruanyifeng.com/blog/2017/04/memory-leak.html)
-[【译】JavaScript是如何工作的：内存管理 + 如何处理4个常见的内存泄露](https://segmentfault.com/a/1190000011411121)
+- [内存管理](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Memory_Management)
+- [前端基础进阶（一）：内存空间详细图解](https://www.jianshu.com/p/996671d4dcc4)
+- [JavaScript 内存泄漏教程](http://www.ruanyifeng.com/blog/2017/04/memory-leak.html)
+- [【译】JavaScript是如何工作的：内存管理 + 如何处理4个常见的内存泄露](https://segmentfault.com/a/1190000011411121)
+
