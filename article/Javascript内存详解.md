@@ -175,6 +175,8 @@ f();
 ## 总结
 ![JS内存详解](/images/Javascript内存详解/JS内存详解.png)
 
+![Javascript内存](/images/Javascript内存详解/Javascript内存.png)
+
 ## 参考资料
 - [内存管理](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Memory_Management)
 - [前端基础进阶（一）：内存空间详细图解](https://www.jianshu.com/p/996671d4dcc4)
