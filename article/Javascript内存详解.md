@@ -182,4 +182,5 @@ f();
 - [前端基础进阶（一）：内存空间详细图解](https://www.jianshu.com/p/996671d4dcc4)
 - [JavaScript 内存泄漏教程](http://www.ruanyifeng.com/blog/2017/04/memory-leak.html)
 - [【译】JavaScript是如何工作的：内存管理 + 如何处理4个常见的内存泄露](https://segmentfault.com/a/1190000011411121)
+- [常见的 JavaScript 内存泄露](https://github.com/zhansingsong/js-leakage-patterns)
 
