@@ -1,5 +1,5 @@
 # 文章
-- [Mac 指南篇](./article/Mac指南.md)
+- [Mac 指南篇](./article/Mac指南篇.md)
 - [http请求之fetch封装](./article/http请求之fetch封装.md)
 - [Event Bus in Vue.js](./article/EventBusinVue.js.md)
 - [Git 分支开发规范](./article/Git分支开发规范.md)
