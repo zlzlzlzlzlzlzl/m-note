@@ -1,4 +1,4 @@
-# Linux Centos 7安装Mongodb
+# Linux Centos 7安装MongoDB
 
 > 本安装教程系统版本为Linux Centos 7，使用Yum源安装MongoDB
 
@@ -66,13 +66,13 @@ gpgkey       #gpg验证
 3. 保存退出
 
 ### 使用yum安装MongoDB
-1. 安装MongoDB
+#### 1. 安装MongoDB
 ```
 # sudo yum install -y mongodb-org
 ```
 <!-- ![配图]() -->
 
-2. 验证安装结果
+#### 2. 验证安装结果
 ```
 rpm -qa |grep mongodb
 ```
@@ -80,23 +80,22 @@ rpm -qa |grep mongodb
 rpm -ql mongodb-org-server
 ```
 
-3. 启动MongoDB
+#### 3. 启动MongoDB
 ```
 systemctl start mongod.service
 ```
-*MongoDB 默认端口是27017，查看是否开启*
+MongoDB默认端口是27017，查看是否开启
 ```
 netstat -natp | grep 27017
 ```
-
-### 验证服务开启
-```
-mongo
-```
-
-检查数据库是否安装成功
+#### 4. 检查数据库是否安装成功
 ```
 ps -aux | grep mongod    # 查看数据库的进程是否存在
+```
+
+#### 5. 验证服务开启
+```
+mongo
 ```
 
 ### 常用命令清单
