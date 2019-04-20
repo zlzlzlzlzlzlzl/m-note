@@ -160,7 +160,7 @@ mongo 10.108.218.14:27017:27017/admin -uusername -p
 
 
 # 参考文献
-[yum使用详解](https://blog.csdn.net/u011305680/article/details/52767230)
-[Install MongoDB Community Edition on Red Hat Enterprise or CentOS Linux](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)
-[CentOS 7上MongoDB数据库安装和卸载](https://www.linuxidc.com/Linux/2017-11/148495.htm)
-[ubuntu mongodb远程连接配置](https://www.jianshu.com/p/03aff57dfe46)
+- [yum使用详解](https://blog.csdn.net/u011305680/article/details/52767230)
+- [Install MongoDB Community Edition on Red Hat Enterprise or CentOS Linux](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)
+- [CentOS 7上MongoDB数据库安装和卸载](https://www.linuxidc.com/Linux/2017-11/148495.htm)
+- [ubuntu mongodb远程连接配置](https://www.jianshu.com/p/03aff57dfe46)
