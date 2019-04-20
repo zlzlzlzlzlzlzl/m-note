@@ -39,12 +39,12 @@ yum clean, yum clean all  // (= yum clean packages; yum clean oldheaders) 清除
 
 ## 安装Mongodb
 ### 配置系统yum源
-1. 创建一个/etc/yum.repos.d/mongodb-org-4.0.repo文件，生成mongodb的源
+#### 1. 创建一个/etc/yum.repos.d/mongodb-org-4.0.repo文件，生成mongodb的源
 ```
 vi /etc/yum.repos.d/mongodb-org-4.0.repo
 ```
 
-2. 添加以下配置信息：
+#### 2. 添加以下配置信息：
 ```
 [mongodb-org-4.0]
 name=MongoDB Repository
@@ -63,7 +63,10 @@ enable=1     #表示启用这个源。
 gpgkey       #gpg验证
 ```
 
-3. 保存退出
+### 3. 保存退出
+```
+wq # 退出保存
+```
 
 ### 使用yum安装MongoDB
 #### 1. 安装MongoDB
