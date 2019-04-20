@@ -81,19 +81,22 @@ rpm -ql mongodb-org-server
 ```
 
 #### 3. 启动MongoDB
+启动MongoDB服务
 ```
 systemctl start mongod.service
 ```
+
 MongoDB默认端口是27017，查看是否开启
 ```
 netstat -natp | grep 27017
 ```
-#### 4. 检查数据库是否安装成功
+
+检查数据库是否安装成功
 ```
 ps -aux | grep mongod    # 查看数据库的进程是否存在
 ```
 
-#### 5. 验证服务开启
+#### 4. 验证服务开启
 ```
 mongo
 ```
@@ -125,18 +128,20 @@ vi /etc/mongodb.conf
 sudo service mongod restart 
 ```
 
-### 3. 关闭防火墙或者开放端口
-**关闭防火墙或者开放端口**
+### 3. 开放对外端口
+**方法一**
 ```
-systemctl stop firewalld  #关闭防火墙
+systemctl status firewalld  # 查看防火墙状态
+systemctl stop firewalld  # 关闭防火墙
+firewall-cmd --zone=public --add-port=27017/tcp --permanent # mongodb默认端口号
+firewall-cmd --reload  # 重新加载防火墙
+
+firewall-cmd --zone=public --query-port=27017/tcp # 查看端口号是否开放成功，输出yes开放成功，no则失败
 ```
-**开放端口号**
+
+**方法二**
 ```
 iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 27017 -j ACCEPT
-
-// 或者
-firewall-cmd --zone=public --add-port=27017/tcp  # mongodb默认端口号
-firewall-cmd --reload  # 重新加载防火墙
 ```
 
 ### 4. 远程连接
