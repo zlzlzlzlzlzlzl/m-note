@@ -3,9 +3,6 @@
 > 本安装教程系统版本为Linux Centos 7，使用Yum源安装MongoDB
 
 ## Yum源
-**安装**
-如果之前安装过了yum源，则跳过此步骤
-
 **使用**
 概括几个常用的： 
 ```js
@@ -39,7 +36,7 @@ yum clean, yum clean all  // (= yum clean packages; yum clean oldheaders) 清除
 
 ## 安装Mongodb
 ### 配置系统yum源
-#### 1. 创建一个/etc/yum.repos.d/mongodb-org-4.0.repo文件，生成mongodb的源
+#### 1. 创建.repo文件，生成mongodb的源
 ```
 vi /etc/yum.repos.d/mongodb-org-4.0.repo
 ```
@@ -73,7 +70,7 @@ wq # 退出保存
 ```
 # sudo yum install -y mongodb-org
 ```
-<!-- ![配图]() -->
+![安装MongoDB](/images/Linux安装Mongodb/mongodb-org.jpg)
 
 #### 2. 验证安装结果
 ```
@@ -82,6 +79,8 @@ rpm -qa |grep mongodb
 ```
 rpm -ql mongodb-org-server
 ```
+![验证安装结果](/images/Linux安装Mongodb/validation.jpg)
+
 
 #### 3. 启动MongoDB
 启动MongoDB服务
@@ -98,33 +97,42 @@ netstat -natp | grep 27017
 ```
 ps -aux | grep mongod    # 查看数据库的进程是否存在
 ```
+![启动MongoDB](/images/Linux安装Mongodb/start.jpg)
 
 #### 4. 验证服务开启
 ```
 mongo
 ```
+![验证服务开启](/images/Linux安装Mongodb/mongo.jpg)
 
 ### 常用命令清单
 ```js
 // 1、开启MongoDB
 sudo service mongod start  或者 systemctl start mongod.service  # 开启MongoDB
-sudo chkconfig mongod on      # 加入开机启动
-sudo service mongod restart   # 重启MongoDB
+sudo chkconfig mongod on  # 加入开机启动
+sudo service mongod restart # 重启MongoDB
 
 // 2、关闭MongoDB
-sudo service mongod stop      # 关闭防火墙
+sudo service mongod stop  # 关闭防火墙
 
 // 3、卸载MongoDB
 sudo yum erase $(rpm -qa | grep mongodb-org)    # 卸载MongoDB
-sudo rm -r /var/log/mongodb    # 删除日志文件
-sudo rm -r /var/lib/mongo      # 删除数据文件
+sudo rm -r /var/log/mongodb  # 删除日志文件
+sudo rm -r /var/lib/mongo    # 删除数据文件
 ```
 
 ## 远程连接Mongodb
 ### 1. 修改配置文件mongodb.conf
 ```
-vi /etc/mongodb.conf
+vi /etc/mongod.conf
+
+# network interfaces
+net:
+  port: 27017
+  bindIp: 0.0.0.0  # Enter 0.0.0.0,:: to bind to all IPv4 and IPv6 addresses or, alternatively, use the net.bindIpAll setting.
 ```
+**#修改绑定ip默认127.0.0.1只允许本地连接， 所以修改为bindIp:0.0.0.0, 退出保存
+**
 
 ### 2. 重启mongodb服务
 ```
@@ -135,7 +143,6 @@ sudo service mongod restart
 **方法一**
 ```
 systemctl status firewalld  # 查看防火墙状态
-systemctl stop firewalld  # 关闭防火墙
 firewall-cmd --zone=public --add-port=27017/tcp --permanent # mongodb默认端口号
 firewall-cmd --reload  # 重新加载防火墙
 
@@ -150,20 +157,78 @@ iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 27017 -j ACCEPT
 ### 4. 远程连接
 **默认连接**
 ```
-mongo 10.108.218.14:27017
+mongo 10.128.218.14:27017
 ```
-**连接到自定义的用户××**
-1. 增加
+**连接到自定义的用户**
+1. 创建用户，设置账号，密码，权限
 ```
->use admin
+// admin数据库
+> use admin
 switched to db admin
->db.addUser('username','password')
+> db.createUser({ user:"root", pwd:"123456", roles:["root"] })
+Successfully added user: { "user" : "root", "roles" : [ "root" ] }
+
+// 其他数据库
+> use test
+switched to db test
+> db.createUser({ user:"admin", pwd:"123456", roles:["readWrite", "dbAdmin"] })
+Successfully added user: { "user" : "root", "roles" : [ "root" ] }
 ```
 
-2. 连接
+
+2. 修改mongodb.conf文件，启用身份验证
 ```
-mongo 10.108.218.14:27017:27017/admin -uusername -p
+vi /etc/mongod.conf
+
+security:
+  authorization: "enabled"   # disable or enabled
 ```
+
+3. 重启MongoDB
+```
+sudo service mongod restart 
+```
+
+4. 用户认证
+```
+> use admin
+switched to db admin
+> db.auth("root", "123456")
+1 // 授权成功
+```
+```
+// 其他常用命令
+db.updateUser(user, writeConcern) # 更新用户
+db.dropUser('test') # 删除用户
+```
+
+5. 远程连接
+```
+// 终端连接
+mongo 10.128.218.14:27017:27017/database -u username -p password
+
+// mongoose方式连接
+mongoose.connect('mongodb://username:password@host:port/database?options...', {useNewUrlParser: true});
+
+// 通过客户端连接
+```
+
+
+
+
+### 用户权限角色说明
+规则 | 说明
+--- | ---
+root                  | 只在admin数据库中可用。超级账号，超级权限
+Read                  | 允许用户读取指定数据库
+readWrite             | 允许用户读写指定数据库
+dbAdmin               | 允许用户在指定数据库中执行管理函数，如索引创建、删除，查看统计或访问system.profile
+userAdmin             | 允许用户向system.users集合写入，可以找指定数据库里创建、删除和管理用户
+clusterAdmin          | 只在admin数据库中可用，赋予用户所有分片和复制集相关函数的管理权限
+readAnyDatabase       | 只在admin数据库中可用，赋予用户所有数据库的读权限
+readWriteAnyDatabase  | 只在admin数据库中可用，赋予用户所有数据库的读写权限
+userAdminAnyDatabase  | 只在admin数据库中可用，赋予用户所有数据库的userAdmin权限
+dbAdminAnyDatabase    | 只在admin数据库中可用，赋予用户所有数据库的dbAdmin权限
 
 
 # 参考文献
@@ -171,3 +236,5 @@ mongo 10.108.218.14:27017:27017/admin -uusername -p
 - [Install MongoDB Community Edition on Red Hat Enterprise or CentOS Linux](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/)
 - [CentOS 7上MongoDB数据库安装和卸载](https://www.linuxidc.com/Linux/2017-11/148495.htm)
 - [ubuntu mongodb远程连接配置](https://www.jianshu.com/p/03aff57dfe46)
+- [How to Enable Authentication on MongoDB](https://medium.com/mongoaudit/how-to-enable-authentication-on-mongodb-b9e8a924efac)
+- [db.createUser()](https://docs.mongodb.com/manual/reference/method/db.createUser/)
