@@ -53,14 +53,14 @@ gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
 
 **详解：**
 ```
-name         #名称
-baseurl      #获得下载的路径
-gpkcheck=1   #表示对从这个源下载的rpm包进行校验；
-enable=1     #表示启用这个源。
-gpgkey       #gpg验证
+name         # 名称
+baseurl      # 获得下载的路径
+gpkcheck=1   # 表示对从这个源下载的rpm包进行校验；
+enable=1     # 表示启用这个源。
+gpgkey       # gpg验证
 ```
 
-### 3. 保存退出
+#### 3. 保存退出
 ```
 wq # 退出保存
 ```
@@ -68,7 +68,7 @@ wq # 退出保存
 ### 使用yum安装MongoDB
 #### 1. 安装MongoDB
 ```
-# sudo yum install -y mongodb-org
+sudo yum install -y mongodb-org
 ```
 ![安装MongoDB](/images/Linux安装Mongodb/mongodb-org.jpg)
 
