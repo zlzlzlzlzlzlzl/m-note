@@ -1,5 +1,7 @@
 # 文章
 - [Mac 指南篇](./article/Mac指南篇.md)
+- [Linux Centos 7安装MongoDB](./article/Linux安装Mongodb.md)
+- [浅拷贝VS深拷贝](./article/浅拷贝VS深拷贝.md)
 - [http请求之fetch封装](./article/http请求之fetch封装.md)
 - [Event Bus in Vue.js](./article/EventBusinVue.js.md)
 - [Git 分支开发规范](./article/Git分支开发规范.md)
