@@ -1,5 +1,7 @@
 # 文章
 - [Mac 指南篇](./article/Mac指南篇.md)
+- [nvm安装与使用](./article/nvm安装与使用.md)
+- [CentOS安装Nodejs](./article/CentOS安装Nodejs.md)
 - [Linux Centos 7安装MongoDB](./article/Linux安装Mongodb.md)
 - [浅拷贝VS深拷贝](./article/浅拷贝VS深拷贝.md)
 - [http请求之fetch封装](./article/http请求之fetch封装.md)
